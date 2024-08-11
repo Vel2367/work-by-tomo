@@ -63,6 +63,7 @@ Section2:NewButton("Reload script", "ButtonInfo", function()
     _G.Attack = false
     _G.XSpeed = false
     _G.Speed = false
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/weak%20legacy%202%20by%20beginner"))()
 end)
 --------Reload script--------
 
