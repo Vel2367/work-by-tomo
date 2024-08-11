@@ -20,13 +20,15 @@ Section:NewSlider("Speed", "SliderInfo", 30, 1, function(s)
 end)
 
 function Speed()
-    _G.XSpeed = true
-        while _G.XSpeed do wait()
-            repeat task.wait()
-                game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(_G.Speed) * 0.2 * 1)
-            until _G.XSpeed == false 
-                wait(1)
-        end
+    spawn(function()
+        _G.XSpeed = true
+            while _G.XSpeed do wait()
+                repeat task.wait()
+                    game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(_G.Speed) * 0.2 * 1)
+                until _G.XSpeed == false 
+                    wait(1)
+            end
+    end)
 end
 
 Section:NewToggle("ToggleSpeed", "ToggleInfo", function(state)
@@ -41,11 +43,30 @@ end)
 --------SPEED-------- 
 
 --------Inf Jump--------
-Section:NewButton("Inf Jump", "ButtonInfo", function()
-    game:GetService("UserInputService").JumpRequest:Connect(function()
-        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+function InfJumping()
+    spawn(function()
+        _G.InfJump = true 
+            while _G.InfJump do
+                repeat task.wait()
+                    game:GetService("UserInputService").JumpRequest:Connect(function()
+                        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+                    end)
+                until _G.InfJump == false
+                wait(1)
+            end
     end)
+end
+
+Section:NewToggle("InfJump", "ToggleInfo", function(state)
+    _G.InfJump = state
+        if _G.InfJump then
+            InfJumping()
+            _G.InfJump = true
+            else
+            _G.InfJump = false
+        end
 end)
+
 --------Inf Jump--------
 
 
@@ -63,45 +84,54 @@ Section2:NewButton("Reload script", "ButtonInfo", function()
     _G.Attack = false
     _G.XSpeed = false
     _G.Speed = false
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/weak%20legacy%202%20by%20beginner"))()
+    
 end)
---------Reload script--------
-
 
 --------AuraTarget--------
-local NPC = {}
 local NPC_unique = {}
 local unique_set = {}
+local npcTarget = {}
 
 for _,npc in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
     if npc.Name == "NPCHandler" then
         local name = npc.Parent.Name
-            table.insert(NPC, name)
-    end
-    for _, value in ipairs(NPC) do
-        if not unique_set[value] then
-            unique_set[value] = true
-            table.insert(NPC_unique, value)
+        if not unique_set[name] then
+            unique_set[name] = true
+            local hum = npc.Parent:FindFirstChildOfClass('Humanoid')
+            if hum then
+                table.insert(NPC_unique, {name = name, maxHealth = hum.MaxHealth})
+            end
         end
     end
 end
 
-Section3:NewDropdown("AuraTarget", "DropdownInf", NPC_unique, function(currentOption)
+table.sort(NPC_unique, function(a, b)
+    return a.maxHealth < b.maxHealth
+end)
+
+for _,npc in ipairs(NPC_unique) do
+    table.insert(npcTarget, npc.name)
+end
+
+Section3:NewDropdown("AuraTarget", "DropdownInf", npcTarget, function(currentOption)
     _G.Target = currentOption
 end)
 --------AuraTarget--------
 
 --------QuestTake--------
 function QuestTake()
-    _G.QuestTake = true
-        while _G.QuestTake do wait(0.2)
-            if game:GetService("Players").FRAB112.Quest.QuestName.Value == 'None' then
-                repeat
-                    game:GetService("ReplicatedStorage").Events.QuestTake:FireServer(_G.Target.. ' Quest',1,"?? YEN, ?? XP",_G.Target,_G.Target.. ' ATTACK')
-                    wait(1)
-                until game:GetService("Players").FRAB112.Quest.QuestName.Value == _G.Target.. ' Quest'
+    spawn(function()
+        _G.QuestTake = true
+            while _G.QuestTake do wait()
+                task.wait()
+                if game:GetService("Players").FRAB112.Quest.QuestName.Value == 'None' then
+                    repeat
+                        game:GetService("ReplicatedStorage").Events.QuestTake:FireServer(_G.Target.. ' Quest',1,"?? YEN, ?? XP",_G.Target,_G.Target.. ' ATTACK')
+                        wait(1)
+                    until game:GetService("Players").FRAB112.Quest.QuestName.Value == _G.Target.. ' Quest' or _G.QuestTake == false
+                end
             end
-        end
+    end)
 end
 
 Section3:NewToggle("AutoQuest", "ToggleInfo", function(state)
@@ -114,31 +144,35 @@ end)
 
 --------Aura--------
 function Farm()
-    _G.Farm = true
-    while _G.Farm do wait()
-        local lowestHealthNPC = nil
-        local lowestHealth = math.huge
+    spawn(function()
+        _G.Farm = true
+        while _G.Farm do wait()
+            repeat
+                task.wait()
+                local lowestHealthNPC = nil
+                local lowestHealth = math.huge
 
-        for _, npc in pairs(game.workspace.CharactersAndNPCs:GetChildren()) do
-            if npc.Name == _G.Target and npc.Humanoid.Health > 1 then
-                if npc.Humanoid.Health < lowestHealth then
-                    lowestHealthNPC = npc
-                    lowestHealth = npc.Humanoid.Health
+                for _, npc in pairs(game.workspace.CharactersAndNPCs:GetChildren()) do
+                    if npc.Name == _G.Target and npc.Humanoid.Health > 1 then
+                        if npc.Humanoid.Health < lowestHealth then
+                            lowestHealthNPC = npc
+                            lowestHealth = npc.Humanoid.Health
+                        end
+                    end
                 end
-            end
-        end
-
-        if lowestHealthNPC then
-            if lowestHealthNPC.Humanoid.Health <= (lowestHealthNPC.Humanoid.MaxHealth * 0.75) then
-                lowestHealthNPC.Humanoid.Health = 0
-            else
-                local rootPart = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if rootPart and lowestHealthNPC:FindFirstChild("HumanoidRootPart") then
-                    rootPart.CFrame = CFrame.new(lowestHealthNPC.HumanoidRootPart.Position) * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                if lowestHealthNPC then
+                    if lowestHealthNPC.Humanoid.Health <= (lowestHealthNPC.Humanoid.MaxHealth * 0.75) then
+                        lowestHealthNPC.Humanoid.Health = 0
+                    else
+                        local rootPart = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if rootPart and lowestHealthNPC:FindFirstChild("HumanoidRootPart") then
+                            rootPart.CFrame = CFrame.new(lowestHealthNPC.HumanoidRootPart.Position) * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                        end
+                    end
                 end
-            end
+            until _G.Farm == false
         end
-    end
+    end)
 end
 
 Section3:NewToggle("Farm[beta]", "ToggleInfo", function(state)
@@ -153,11 +187,13 @@ end)
 
 --------Combo--------
 function Attack()
-    _G.Attack = true
-        while _G.Attack do 
-            game:GetService("ReplicatedStorage").Remotes.Attack:FireServer("M1","Katana",false)
-            wait(0.2)
-        end
+    spawn(function()
+        _G.Attack = true
+            while _G.Attack do 
+                game:GetService("ReplicatedStorage").Remotes.Attack:FireServer("M1","Katana",false)
+                wait(0.2)
+            end
+    end)
 end
 
 Section4:NewToggle("AutoAttack", "ToggleInfo", function(state)
