@@ -6,11 +6,12 @@ local chr = game:GetService("Workspace").CharactersAndNPCs
 
 local Tab = Window:NewTab("MISC")
 local Tab2 = Window:NewTab("Farm")
+local Tab3 = Window:NewTab("Combat")
 
 local Section = Tab:NewSection("Speed")
 local Section2 = Tab:NewSection("Fps boost")
 local Section3 = Tab2:NewSection("AutoFarm")
-local Section4 = Tab2:NewSection("Combat")
+local Section4 = Tab3:NewSection("Combat")
 
 
 
@@ -26,7 +27,7 @@ function Speed()
                 repeat task.wait()
                     game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(_G.Speed) * 0.2 * 1)
                 until _G.XSpeed == false 
-                    wait(1)
+                    wait(0.2)
             end
     end)
 end
@@ -52,7 +53,6 @@ function InfJumping()
                         game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
                     end)
                 until _G.InfJump == false
-                wait(1)
             end
     end)
 end
@@ -84,7 +84,7 @@ Section2:NewButton("Reload script", "ButtonInfo", function()
     _G.Attack = false
     _G.XSpeed = false
     _G.Speed = false
-    
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/weak%20legacy%202%20by%20beginner"))()
 end)
 
 --------AuraTarget--------
@@ -183,7 +183,23 @@ Section3:NewToggle("Farm[beta]", "ToggleInfo", function(state)
 end)
 --------Aura--------    
 
+--------Players--------
+local PlayaersforTarget = {}
+local unique_set2 = {}
+for _,plr in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
+    if plr.Name == 'LoadingStuff' then
+        local plrname = plr.Parent.Name
+        if not unique_set2[plrname] then
+            unique_set2[plrname] = true
+            table.insert(PlayaersforTarget, plrname)
+        end
+    end
+end
 
+Section4:NewDropdown("PlayersTarget", "DropdownInf", PlayaersforTarget, function(currentOption)
+    _G.PlayerTarget = currentOption
+end)
+--------Players--------
 
 --------Combo--------
 function Attack()
