@@ -89,7 +89,7 @@ Section2:NewButton("Reload script", "ButtonInfo", function()
     _G.KillAuraToggle = false
     _G.Breath = false
     _G.Skills = false
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/weak%20legacy%202%20by%20beginner"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/WeakLegacy2Kuto"))()
 end)
 --------Reload script--------
 
