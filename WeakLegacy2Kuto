@@ -1,0 +1,309 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Robojini/Tuturial_UI_Library/main/UI_Template_1"))()
+local Window = Library.CreateLib("Kuto", "RJTheme5")
+
+local chr = game:GetService("Workspace").CharactersAndNPCs
+
+
+local Tab = Window:NewTab("MISC")
+local Tab2 = Window:NewTab("Farm")
+local Tab3 = Window:NewTab("Combat")
+
+local Section = Tab:NewSection("Speed")
+local Section2 = Tab:NewSection("Fps boost")
+local Section3 = Tab2:NewSection("AutoFarm")
+local Section4 = Tab3:NewSection("Combat")
+
+
+
+--------SPEED--------
+Section:NewSlider("Speed", "SliderInfo", 30, 1, function(s) 
+    _G.Speed = s
+end)
+
+function Speed()
+    spawn(function()
+        _G.XSpeed = true
+            while _G.XSpeed do wait()
+                repeat task.wait()
+                    game.Players.LocalPlayer.Character:TranslateBy(game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid").MoveDirection * tonumber(_G.Speed) * 0.2 * 1)
+                until _G.XSpeed == false 
+                    wait(0.2)
+            end
+    end)
+end
+
+Section:NewToggle("ToggleSpeed", "ToggleInfo", function(state)
+    _G.XSpeed = state
+    if state then
+        Speed()
+        _G.XSpeed = true
+        else
+        _G.XSpeed = false
+    end
+end)
+--------SPEED-------- 
+
+--------Inf Jump--------
+function InfJumping()
+    spawn(function()
+        _G.InfJump = true 
+            while _G.InfJump do
+                repeat task.wait()
+                    game:GetService("UserInputService").JumpRequest:Connect(function()
+                        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+                    end)
+                until _G.InfJump == false
+            end
+    end)
+end
+
+Section:NewToggle("InfJump", "ToggleInfo", function(state)
+    _G.InfJump = state
+        if _G.InfJump then
+            InfJumping()
+            _G.InfJump = true
+            else
+            _G.InfJump = false
+        end
+end)
+
+--------Inf Jump--------
+
+
+
+--------FPS BOOST--------   
+Section2:NewButton("FPS BOOST(not working)", "ButtonInfo", function()
+end)
+--------FPS BOOST--------
+
+--------Reload script--------
+Section2:NewButton("Reload script", "ButtonInfo", function()
+    _G.Target = false
+    _G.QuestTake = false
+    _G.Farm = false
+    _G.Attack = false
+    _G.XSpeed = false
+    _G.Speed = false
+    _G.Breath = false
+    _G.PlayerTarget = false
+    _G.KillAuraToggle = false
+    _G.Breath = false
+    _G.Skills = false
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Vel2367/work-by-tomo/main/weak%20legacy%202%20by%20beginner"))()
+end)
+--------Reload script--------
+
+
+--------AuraTarget--------
+local NPC_unique = {}
+local unique_set = {}
+local npcTarget = {}
+
+for _,npc in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
+    if npc.Name == "NPCHandler" then
+        local name = npc.Parent.Name
+        if not unique_set[name] then
+            unique_set[name] = true
+            local hum = npc.Parent:FindFirstChildOfClass('Humanoid')
+            if hum then
+                table.insert(NPC_unique, {name = name, maxHealth = hum.MaxHealth})
+            end
+        end
+    end
+end
+
+table.sort(NPC_unique, function(a, b)
+    return a.maxHealth < b.maxHealth
+end)
+
+for _,npc in ipairs(NPC_unique) do
+    table.insert(npcTarget, npc.name)
+end
+
+Section3:NewDropdown("AuraTarget", "DropdownInf", npcTarget, function(currentOption)
+    _G.Target = currentOption
+end)
+--------AuraTarget--------
+
+
+--------QuestTake--------
+function QuestTake()
+    spawn(function()
+        _G.QuestTake = true
+            while _G.QuestTake do wait()
+                task.wait()
+                if game:GetService("Players").FRAB112.Quest.QuestName.Value == 'None' then
+                    repeat
+                        game:GetService("ReplicatedStorage").Events.QuestTake:FireServer(_G.Target.. ' Quest',1,"?? YEN, ?? XP",_G.Target,_G.Target.. ' ATTACK')
+                        wait(1)
+                    until game:GetService("Players").FRAB112.Quest.QuestName.Value == _G.Target.. ' Quest' or _G.QuestTake == false
+                end
+            end
+    end)
+end
+
+Section3:NewToggle("AutoQuest", "ToggleInfo", function(state)
+    _G.QuestTake = state
+        if _G.QuestTake then
+            QuestTake()
+        end
+end)
+--------QuestTake--------
+
+--------Aura--------
+function Farm()
+    spawn(function()
+        _G.Farm = true
+        while _G.Farm do wait()
+            repeat
+                task.wait()
+                local lowestHealthNPC = nil
+                local lowestHealth = math.huge
+
+                for _, npc in pairs(game.workspace.CharactersAndNPCs:GetChildren()) do
+                    if npc.Name == _G.Target and npc.Humanoid.Health > 1 then
+                        if npc.Humanoid.Health < lowestHealth then
+                            lowestHealthNPC = npc
+                            lowestHealth = npc.Humanoid.Health
+                        end
+                    end
+                end
+                if lowestHealthNPC then
+                    if lowestHealthNPC.Humanoid.Health <= (lowestHealthNPC.Humanoid.MaxHealth * 0.75) then
+                        lowestHealthNPC.Humanoid.Health = 0
+                    else
+                        local rootPart = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if rootPart and lowestHealthNPC:FindFirstChild("HumanoidRootPart") then
+                            rootPart.CFrame = CFrame.new(lowestHealthNPC.HumanoidRootPart.Position) * CFrame.new(0, 7, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                        end
+                    end
+                end
+            until _G.Farm == false
+            wait(0.3)
+        end
+    end)
+end
+
+Section3:NewToggle("Farm[beta]", "ToggleInfo", function(state)
+    _G.Farm = state
+        if _G.Farm then
+            Farm()
+        end
+end)
+--------Aura--------    
+
+--------Players--------
+local PlayersforTarget = {}
+local unique_set2 = {}
+for _,plr in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
+    if plr.Name == 'LoadingStuff' then
+        local plrname = plr.Parent.Name
+        if not unique_set2[plrname] then
+            unique_set2[plrname] = true
+            table.insert(PlayersforTarget, plrname)
+        end
+    end
+end
+
+Section4:NewDropdown("PlayersTarget", "DropdownInf", PlayersforTarget, function(currentOption)
+    _G.PlayerTarget = currentOption
+end)
+--------Players--------
+
+
+--------KillAura--------
+function KillAura()
+    spawn(function()
+        _G.KillAuraToggle = true
+        while _G.KillAuraToggle do wait()
+            repeat
+                task.wait()  
+                for _, aim in pairs(workspace.CharactersAndNPCs:GetDescendants()) do
+                    if aim:IsA("Model") and aim.Name == _G.PlayerTarget then
+                        local rootPart = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if rootPart and aim:FindFirstChild("HumanoidRootPart") then
+                            rootPart.CFrame = CFrame.new(aim:FindFirstChild("HumanoidRootPart").Position) * CFrame.new(0, 5, 0) * CFrame.Angles(math.rad(-90), 0, 0)
+                        end
+                    end
+                end
+            until _G.KillAuraToggle == false
+        end
+    end)
+end
+
+Section4:NewToggle("KillAura", "ToggleInfo", function(state)
+    _G.KillAuraToggle = state
+        if _G.KillAuraToggle then
+            KillAura()
+        end
+end)
+--------KillAura--------
+
+
+--------Attack--------
+function Attack()
+    spawn(function()
+        _G.Attack = true
+            while _G.Attack do 
+                game:GetService("ReplicatedStorage").Remotes.Attack:FireServer("M1","Katana",false)
+                wait(0.4)
+            end
+    end)
+end
+
+Section4:NewToggle("AutoAttack", "ToggleInfo", function(state)
+    _G.Attack = state
+    if _G.Attack then
+        Attack()   
+    end
+end)
+--------Attack--------
+
+--------Breath--------
+function AutoBreath()
+    spawn(function()
+        _G.Breath = true
+            while _G.Breath do task.wait()
+                if game:GetService("Players").FRAB112.Breathing.Value ~= game:GetService("Players").FRAB112.BreathingSettings.MaxBreathing.Value then
+                    game:GetService("ReplicatedStorage").Events.Breathing:FireServer("BeginHamonBreathing")
+                end
+            end
+    end)
+end
+
+Section4:NewToggle("AutoBreath", "ToggleInfo", function(state)
+    _G.Breath = state
+        if _G.Breath then
+            AutoBreath()
+        end
+end)
+--------Breath--------
+
+
+--------Skill--------
+local Skill = {}
+function GetSkills()
+    spawn(function()
+        _G.Skills = true
+            while _G.Skills do wait()
+                pcall(function()
+                    if not game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+                    game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode.One,false,game)
+                    end
+                    for i,v in pairs(game:GetService("Players").LocalPlayer.Keybinds:GetChildren()) do
+                        game:GetService("VirtualInputManager"):SendKeyEvent(true,Enum.KeyCode[v.Value],false,game)
+                        game:GetService("VirtualInputManager"):SendKeyEvent(false,Enum.KeyCode[v.Value],false,game)
+                    end
+                    wait()
+                end)
+            end
+    end)
+end
+
+Section4:NewToggle("AutoSkills", "ToggleInfo", function(state)
+    _G.Skills = state
+        if _G.Skills then
+            GetSkills()
+        end
+end)
+--------Skill-------- 
